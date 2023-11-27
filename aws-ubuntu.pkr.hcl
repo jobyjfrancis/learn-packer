@@ -30,7 +30,8 @@ source "amazon-ebs" "ubuntu" {
   associate_public_ip_address = "true"
   source_ami_filter {
     filters = {
-      name                = "ubuntu-minimal/images/hvm-ssd/ubuntu-jammy-22.04-amd64-minimal-20221027"
+      //name                = "ubuntu-minimal/images/hvm-ssd/ubuntu-jammy-22.04-amd64-minimal-20221027"
+      name                = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
@@ -48,25 +49,12 @@ build {
   sources = [
     "source.amazon-ebs.ubuntu"
   ]
-  provisioner "shell" {
-    environment_vars = [
-      "FOO=hello world",
-    ]
-    inline = [
-      "echo Installing Redis",
-      "sleep 30",
-      "sudo apt-get update",
-      "sudo apt-get install -y redis-server",
-      "echo \"FOO is $FOO\" > example.txt",
-    ]
-  }
 
   provisioner "shell" {
     inline = ["cloud-init status --wait"]
   }
 
-  /*provisioner "shell" {
-    execute_command = "{{.Vars}} sudo -E -S '{{.Path}}'"
-    script          = "./install-basebox.sh"
-  }*/
+  provisioner "shell" {
+    inline = ["apt-get -y install nginx"]
+  }
 }
